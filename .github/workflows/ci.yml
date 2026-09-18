@@ -1,0 +1,23 @@
+name: CI - Build et Scan de sécurité
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Construire l'image Docker
+        run: docker build -t mon-app-securisee:latest .
+
+      - name: Scanner l'image avec Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'mon-app-securisee:latest'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'   # fait échouer le pipeline si une faille critique est trouvée
